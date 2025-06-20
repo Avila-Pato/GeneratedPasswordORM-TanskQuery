@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { PasswordChemaType, passwordSchema } from "@/schema/password.schema";
 import { PasswordConfig } from "@/lib/password";
+import PasswordOptionTags from "./password-options-tags";
 
 
 interface Props {
@@ -124,7 +125,9 @@ const FormSavePassword = ({ password, passwordConfig }: Props) => {
                                             Longitud de la contraseña:
                                             {passwordConfig.length} caracteres
                                         </span>
+
                                     </p>
+                                    <PasswordOptionTags passwordConfig={passwordConfig} />
                                 </div>
                             </div>
 
@@ -148,7 +151,9 @@ const FormSavePassword = ({ password, passwordConfig }: Props) => {
                         <Button variant="outline">Cancelar</Button>
                     </DialogClose>
                     <DialogClose asChild>
-                        <Button type="submit">Guardar cambios</Button>
+                        <Button
+                        onClick={form.handleSubmit(onSubmit)} 
+                        type="submit">Guardar Contraseña</Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>
