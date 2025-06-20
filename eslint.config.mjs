@@ -10,7 +10,16 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  // ⬇ Esto agrega tus presets de Next.js + TS
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+
+  // ⬇ Aquí defines los patrones que quieres ignorar
+  {
+    ignores: [
+      "app/generated/prisma/wasm.js",  // Ignora ese archivo específico
+      "app/generated/prisma/**/*.js",  // O puedes ignorar todos los archivos de esa carpeta
+    ]
+  }
 ];
 
 export default eslintConfig;
