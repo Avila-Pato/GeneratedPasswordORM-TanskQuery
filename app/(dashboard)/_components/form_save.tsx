@@ -27,6 +27,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { PasswordChemaType, passwordSchema } from "@/schema/password.schema";
 import { PasswordConfig } from "@/lib/password";
 import PasswordOptionTags from "./password-options-tags";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { CreatePasswordAction } from "../_actions/create-password-action";
 
 
 interface Props {
@@ -50,7 +53,7 @@ const FormSavePassword = ({ password, passwordConfig }: Props) => {
     useEffect(() => {
         if (isOpen) {
             form.setValue("password", password || "");
-            form.setValue("length", passwordConfig.length);
+            form.setValue("Length", passwordConfig.length);
             form.setValue("hasLowercase", passwordConfig.hasLowerCase );
             form.setValue("hasUppercase", passwordConfig.hasUppercase );
             form.setValue("hasNumbers", passwordConfig.hasNumbers );
@@ -60,11 +63,35 @@ const FormSavePassword = ({ password, passwordConfig }: Props) => {
 
     },[ isOpen, password, passwordConfig, form])
 
+    const queryClient = useQueryClient() // Obtiene la instancia del cliente de consultas de TanStack Query (React Query)
+
+//useMutation es un hook de TanStack Query (React Query) que se usa para manejar operaciones que modifican datos:
+// ✅ POST (crear)
+// ✅ PUT / PATCH (actualizar)
+// ✅ DELETE (eliminar)
+    const {mutate, isPending} = useMutation({
+        mutationFn: CreatePasswordAction,
+        async onSuccess(data) {
+            form.reset()
+
+            toast.success(`Password guardada correctamente: ${data.title}`, )
+            setIsOpen(false); // cierra el modal al guardar
+
+            // Revalidar las consultas relacionadas con las contraseñas
+            // Esto es útil para actualizar la lista de contraseñas en la UI
+            queryClient.invalidateQueries({
+                queryKey: ['password']
+            })
+        },
+        onError(error) {
+            toast.error(`Error al guardar la contraseña: ${error instanceof Error ? error.message : "Error desconocido"}`);
+        }
+
+    })
+
     // 2. Define a submit handler.
     function onSubmit(values: PasswordChemaType) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+       mutate(values)
     }
     return (
         <Dialog
@@ -152,6 +179,7 @@ const FormSavePassword = ({ password, passwordConfig }: Props) => {
                     </DialogClose>
                     <DialogClose asChild>
                         <Button
+                        disabled={isPending}
                         onClick={form.handleSubmit(onSubmit)} 
                         type="submit">Guardar Contraseña</Button>
                     </DialogClose>

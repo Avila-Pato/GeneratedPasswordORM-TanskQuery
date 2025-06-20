@@ -12,7 +12,7 @@ const ThemeProviders = ({ children,  }: { children: ReactNode }) => {
     return (
         <QueryClientProvider client={queryClient}  >
             <Toaster
-                position='bottom-center'
+                position='top-right'
                 richColors />
             {children}
         </QueryClientProvider>
